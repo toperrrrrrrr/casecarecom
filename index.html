@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Medical Record Review</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #333333;
+      margin-bottom: 1rem;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 1rem auto;
+      padding: 0.5rem;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      background-color: #f8f9fa;
+      cursor: pointer;
+    }
+
+    #output {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: #555555;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 4px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .highlight {
+      color: #007bff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Medical Record Review</h1>
+    <input type="file" id="pdfUpload" accept="application/pdf" />
+    <div id="output">Upload a PDF to calculate the pricing and review time.</div>
+  </div>
+
+  <script>
+    const ratePerPage = 2; // $2 per page
+    const pagesPerDay = 5; // 5 pages per day for review
+
+    document.getElementById('pdfUpload').addEventListener('change', async (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        try {
+          const pdfjsLib = window['pdfjs-dist/build/pdf'];
+          const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+          const numPages = pdf.numPages;
+
+          const totalPrice = numPages * ratePerPage;
+          const reviewDays = Math.ceil(numPages / pagesPerDay);
+
+          document.getElementById('output').innerHTML =
+            `Total Pages: <span class="highlight">${numPages}</span><br>
+            Total Price: <span class="highlight">$${totalPrice}</span><br>
+            Estimated Review Time: <span class="highlight">${reviewDays} day(s)</span>`;
+        } catch (error) {
+          document.getElementById('output').textContent = 'Error processing the PDF. Please try again.';
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>
